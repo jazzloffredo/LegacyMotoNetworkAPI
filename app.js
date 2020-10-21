@@ -1,7 +1,8 @@
+var cookieParser = require('cookie-parser');
+var cors = require('cors');
 var createError = require('http-errors');
 var express = require('express');
 var path = require('path');
-var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
 var indexRouter = require('./routes/index');
@@ -19,8 +20,20 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', indexRouter);
-app.use('/users', usersRouter);
+app.use(nconf.get('api-path') + '/', indexRouter);
+app.use(nconf.get('api-path') + '/auth', usersRouter);
+app.use(nconf.get('api-path') + '/user', usersRouter);
+app.use(nconf.get('api-path') + '/group', usersRouter);
+app.use(nconf.get('api-path') + '/post', usersRouter);
+app.use(nconf.get('api-path') + '/comment', usersRouter);
+
+// enable cors
+app.use(cors({
+  origin: 'https://www.motonetwork.us',
+  methods: 'GET,PUT,PATCH,POST,DELETE',
+  preflightContinue: false,
+  optionsSuccessStatus: '204',
+}));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

@@ -1,16 +1,42 @@
 {
   "name": "motonetwork-api",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "author": {
+    "name": "Jazz Loffredo",
+    "email": "jloffredo@ksu.edu",
+    "url": "https://www.motonetwork.us/api/v1"
+  },
+  "description": "API for social networking site geared towards motorcycle enthusiasts.",
   "private": true,
   "scripts": {
     "start": "node ./bin/www"
   },
   "dependencies": {
+    "bcrypt": "^5.0.0",
+    "body-parser": "^1.19.0",
     "cookie-parser": "~1.4.4",
+    "cors": "^2.8.5",
     "debug": "~2.6.9",
+    "dotenv": "^8.2.0",
+    "errorhandler": "^1.5.1",
     "express": "~4.16.1",
+    "hat": "0.0.3",
     "http-errors": "~1.6.3",
-    "jade": "~1.11.0",
-    "morgan": "~1.9.1"
+    "install": "^0.13.0",
+    "jsonwebtoken": "^8.5.1",
+    "lodash": "^4.17.20",
+    "moment": "^2.29.1",
+    "morgan": "^1.9.1",
+    "nconf": "^0.10.0",
+    "neo4j-driver": "^4.1.2",
+    "passport": "^0.4.1",
+    "passport-jwt": "^4.0.0",
+    "passport-local": "^1.0.0",
+    "uuid": "^8.3.1"
+  },
+  "devDependencies": {
+    "chai": "^4.2.0",
+    "chai-http": "^4.3.0",
+    "mocha": "^8.2.0"
   }
 }
