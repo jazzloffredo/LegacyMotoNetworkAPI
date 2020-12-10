@@ -1,6 +1,6 @@
 var _ = require("lodash");
 
-var Post = (module.exports = function (_node) {
+var NeoPost = (module.exports = function (_node) {
   var message = _node.properties['message'];
   var timestamp = _node.properties['timestamp'];
 
