@@ -1,54 +1,79 @@
-var cookieParser = require('cookie-parser');
-var cors = require('cors');
-var createError = require('http-errors');
-var express = require('express');
-var path = require('path');
-var logger = require('morgan');
+var cookieParser = require("cookie-parser");
+var cors = require("cors");
+var express = require("express");
+var logger = require("morgan");
+var path = require("path");
+var session = require("express-session");
 
-var indexRouter = require('./routes/index');
-var usersRouter = require('./routes/users');
+var MemoryStore = require("memorystore")(session);
+
+var nconf = require("./config");
+
+require("dotenv").config();
 
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'jade');
+app.set("views", path.join(__dirname, "views"));
+app.set("view engine", "jade");
 
-app.use(logger('dev'));
+app.use(logger("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, "public")));
 
-app.use(nconf.get('api-path') + '/', indexRouter);
-app.use(nconf.get('api-path') + '/auth', usersRouter);
-app.use(nconf.get('api-path') + '/user', usersRouter);
-app.use(nconf.get('api-path') + '/group', usersRouter);
-app.use(nconf.get('api-path') + '/post', usersRouter);
-app.use(nconf.get('api-path') + '/comment', usersRouter);
+//  Session setup
+app.use(
+  session({
+    secret: process.env.SECRET_KEY,
+    cookie: {
+      maxAge: 86400000,
+      secure: false,
+    },
+    store: new MemoryStore({
+      checkPeriod: 86400000, // prune expired entries every 24h
+    }),
+    saveUninitialized: true,
+    resave: false,
+    unset: "destroy",
+  })
+);
 
-// enable cors
-app.use(cors({
-  origin: 'https://www.motonetwork.us',
-  methods: 'GET,PUT,PATCH,POST,DELETE',
-  preflightContinue: false,
-  optionsSuccessStatus: '204',
-}));
+// cors
+app.use(
+  cors({
+    methods: "GET,PUT,PATCH,POST,DELETE",
+    origin: ["http://localhost:8080", "https://localhost:8080"],
+    exposedHeaders: ["set-cookie"],
+    optionsSuccessStatus: "204",
+    credentials: true,
+    /* preflightContinue: false, */
+  })
+);
 
-// catch 404 and forward to error handler
-app.use(function(req, res, next) {
-  next(createError(404));
-});
+// routers
+var indexRouter = require("./routes/index");
+var authRouter = require("./routes/auth");
+var usersRouter = require("./routes/users");
+var groupsRouter = require("./routes/groups");
+var postsRouter = require("./routes/posts");
+
+// define routes
+app.use(nconf.get("api_path") + "/", indexRouter);
+app.use(nconf.get("api_path") + "/auth", authRouter);
+app.use(nconf.get("api_path") + "/user", usersRouter);
+app.use(nconf.get("api_path") + "/group", groupsRouter);
+app.use(nconf.get("api_path") + "/post", postsRouter);
 
 // error handler
-app.use(function(err, req, res, next) {
-  // set locals, only providing error in development
-  res.locals.message = err.message;
-  res.locals.error = req.app.get('env') === 'development' ? err : {};
-
-  // render the error page
-  res.status(err.status || 500);
-  res.render('error');
+app.use(function (err, req, res, next) {
+  console.log(err);
+  if (res.headersSent) {
+    return next(err);
+  } else {
+    res.status(err.status || 500).json({ error: err });
+  }
 });
 
 module.exports = app;

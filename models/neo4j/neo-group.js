@@ -1,6 +1,6 @@
 var _ = require("lodash");
 
-var Group = (module.exports = function (_node) {
+var NeoGroup = (module.exports = function (_node) {
   var name = _node.properties['name'];
   var creationDate = _node.properties['creationDate'];
 
